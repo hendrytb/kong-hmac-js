@@ -38,3 +38,6 @@ jspm_packages
 
 # phpstorm
 .idea
+
+# Compiled ES5 JS
+/lib

@@ -1,6 +1,6 @@
 {
   "name": "kong-hmac",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "JS module for HMAC Authentication with Kong",
   "main": "src/index.js",
   "scripts": {
@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/y-zono/kong-hmac-js/issues"
   },
-  "homepage": "https://github.com/y-zono/kong-hmac-js#readme"
+  "homepage": "https://github.com/y-zono/kong-hmac-js#readme",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "compile": "babel --presets es2015 -d lib/ src/",
+    "prepublish": "npm run compile"
+  }
 }
