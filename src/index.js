@@ -44,23 +44,39 @@ module.exports = function (userName, secret, url, data = null, contentType = nul
         return crypto.createHmac("sha1", secret).update(signatureString).digest("base64")
     }
 
+    let md5HashBase64 = function(data)
+    {
+        return crypto.createHash("md5").update(data, "binary").digest("base64")
+    }
+
     // Determine request method
     let requestMethod;
+    let base64md5;
+    let contentLength;
+
+    let signatureHeaders = new Map();
+
     if (!url || !contentType) {
         requestMethod = "GET";
     } else {
         requestMethod = "POST";
+
+        // MD5 digest of the content
+        base64md5 = md5HashBase64(data);
+
+        // Set the content-length header
+        contentLength = data.length;
+
+        // Add headers for the signature hash
+        signatureHeaders.set("content-type", contentType);
+        signatureHeaders.set("content-md5", base64md5);
+        signatureHeaders.set("content-length", contentLength);
     }
 
     // Build the request-line header
     let parsedUrl = urllib.parse(url);
-    let targetUrl = parsedUrl.host;
-    if (parsedUrl.path) {
-        targetUrl += parsedUrl.path;
-    }
+    let targetUrl = parsedUrl.path;
     let requestLine = requestMethod + " " + targetUrl + " HTTP/1.1";
-
-    let signatureHeaders = new Map();
 
     // Set the date header
     let dateHeader = createDateHeader();
@@ -92,6 +108,15 @@ module.exports = function (userName, secret, url, data = null, contentType = nul
             "Host" : parsedUrl.hostname,
             "Authorization" : authHeader,
             "Date" : dateHeader
+        }
+    } else {
+        requestHeaders = {
+            "Host" : parsedUrl.hostname,
+            "Authorization" : authHeader,
+            "Date" : dateHeader,
+            "Content-Type" : contentType,
+            "Content-MD5" : base64md5,
+            "Content-Length" : contentLength
         }
     }
 
