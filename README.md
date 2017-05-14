@@ -16,16 +16,25 @@ GET request:
 const request = require("request");
 const generateRequestHeaders = require("kong-hmac");
 
-// GET
 const userName = "user";
 const secret = "secret";
 const url = "https://example.com/items";
+const method = "GET";
+const httpVersion = "HTTP/1.0"; // default "HTTP/1.1"
 
-let headers = generateRequestHeaders(userName, secret, url);
+const params = {
+    userName: userName,
+    secret: secret,
+    url: url,
+    method: method,
+    httpVersion: httpVersion
+}
+
+let headers = generateRequestHeaders(params);
 
 let options = {
     url: url,
-    method: "GET",
+    method: method,
     headers: headers
 }
 
@@ -45,18 +54,32 @@ POST request:
 const request = require("request");
 const generateRequestHeaders = require("kong-hmac");
 
-// POST
 const userName = "user";
 const secret = "secret";
 const url = "https://example.com/items";
-const data = { "a" : "x" };
+const method = "POST";
+const httpVersion = "HTTP/1.0"; // default "HTTP/1.1"
+
+const data = {
+  "name" : "X"
+};
 const contentType = "application/json";
 
-let headers = generateRequestHeaders(userName, secret, url, JSON.stringify(data), contentType);
-
-    let options = {
+const params = {
+    userName: userName,
+    secret: secret,
     url: url,
-    method: "POST",
+    method: method,
+    data: JSON.stringify(data),
+    contentType: contentType,
+    httpVersion: httpVersion
+}
+
+let headers = generateRequestHeaders(params);
+
+let options = {
+    url: url,
+    method: method,
     headers: headers,
     json: data 
  }
@@ -64,6 +87,90 @@ let headers = generateRequestHeaders(userName, secret, url, JSON.stringify(data)
 request(options, function (error, response, body) {
     if (!error && response.statusCode == 200) {
         console.log(body);
+    } else {
+        console.log("error:" + response.statusCode);
+        console.log(body);
+    }
+});
+```
+
+UPDATE request:
+
+```
+const request = require("request");
+const generateRequestHeaders = require("kong-hmac");
+
+const userName = "user";
+const secret = "secret";
+const url = "https://example.com/items";
+const method = "UPDATE";
+const httpVersion = "HTTP/1.0"; // default "HTTP/1.1"
+
+const data = {
+  "name" : "Y"
+};
+const contentType = "application/json";
+
+const params = {
+    userName: userName,
+    secret: secret,
+    url: url,
+    method: method,
+    data: JSON.stringify(data),
+    contentType: contentType,
+    httpVersion: httpVersion
+}
+
+let headers = generateRequestHeaders(params);
+
+let options = {
+    url: url,
+    method: method,
+    headers: headers,
+    json: data 
+ }
+
+request(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        console.log(body);
+    } else {
+        console.log("error:" + response.statusCode);
+        console.log(body);
+    }
+});
+```
+
+DELETE request:
+
+```
+const request = require("request");
+const generateRequestHeaders = require("kong-hmac");
+
+const userName = "user";
+const secret = "secret";
+const url = "https://example.com/items/1";
+const method = "DELETE";
+const httpVersion = "HTTP/1.0"; // default "HTTP/1.1"
+
+const params = {
+    userName: userName,
+    secret: secret,
+    url: url,
+    method: method,
+    httpVersion: httpVersion
+}
+
+let headers = generateRequestHeaders(params);
+
+let options = {
+    url: url,
+    method: method,
+    headers: headers
+}
+
+request(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        console.log("statusCode:" + response.statusCode);
     } else {
         console.log("error:" + response.statusCode);
         console.log(body);
