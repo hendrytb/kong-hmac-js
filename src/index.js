@@ -119,7 +119,7 @@ module.exports = function(params) {
     signatureHeaders.set("date", dateHeader);
 
     // Add to headers for the signature hash
-    signatureHeaders.set("request-line", requestLine);
+    // signatureHeaders.set("request-line", requestLine);
 
     // Get the list of headers
     let headers = getHeadersString(signatureHeaders);
