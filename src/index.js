@@ -4,15 +4,12 @@ const util = require("util");
 const urllib = require("url");
 const crypto = require("crypto");
 
-module.exports = function (params)
-{
-    let createDateHeader = function()
-    {
+module.exports = function(params) {
+    let createDateHeader = function() {
         return new Date().toGMTString();
     }
 
-    let getHeadersString = function(signatureHeaders)
-    {
+    let getHeadersString = function(signatureHeaders) {
         let headers = "";
         for (var [key, val] of signatureHeaders) {
             if (headers !== "") {
@@ -23,8 +20,7 @@ module.exports = function (params)
         return headers;
     }
 
-    let getSignatureString = function(signatureHeaders)
-    {
+    let getSignatureString = function(signatureHeaders) {
         let sigString = "";
         for (var [key, val] of signatureHeaders) {
             if (sigString !== "") {
@@ -39,17 +35,15 @@ module.exports = function (params)
         return sigString;
     }
 
-    let sha1HashBase64 = function(signatureString, secret)
-    {
+    let sha1HashBase64 = function(signatureString, secret) {
         return crypto.createHmac("sha1", secret).update(signatureString).digest("base64");
     }
 
-    let md5HashBase64 = function(data)
-    {
+    let md5HashBase64 = function(data) {
         return crypto.createHash("md5").update(data, "binary").digest("base64");
     }
 
-    let validateParams = function (params) {
+    let validateParams = function(params) {
         // UserName
         if (!params.userName || !params.userName.length) {
             throw new Error("userName is required");
@@ -66,9 +60,17 @@ module.exports = function (params)
         if (!params.method || !params.method.length) {
             throw new Error("method is required");
         }
+        // token
+        if (!params.token || !params.token.length) {
+            throw new Error("token is required for JWT oAuth");
+        }
+        // host
+        if (!params.host || !params.host.length) {
+            throw new Error("host is required");
+        }
         // Method
         let requestMethod = params.method.toUpperCase();
-        if (requestMethod !== "GET" && requestMethod !== "POST"  && requestMethod !== "UPDATE" && requestMethod !== "DELETE") {
+        if (requestMethod !== "GET" && requestMethod !== "POST" && requestMethod !== "UPDATE" && requestMethod !== "DELETE") {
             throw new Error("method is invalid");
         }
         if (requestMethod === "POST" || requestMethod === "UPDATE") {
@@ -139,18 +141,20 @@ module.exports = function (params)
     let requestHeaders;
     if (requestMethod === "GET" || requestMethod === "DELETE") {
         requestHeaders = {
-            "Host" : parsedUrl.hostname,
-            "Authorization" : authHeader,
-            "Date" : dateHeader
+            "Host": params.host,
+            "Proxy-Authorization": authHeader,
+            "Authorization": params.token,
+            "Date": dateHeader
         }
     } else {
         requestHeaders = {
-            "Host" : parsedUrl.hostname,
-            "Authorization" : authHeader,
-            "Date" : dateHeader,
-            "Content-Type" : params.contentType,
-            "Content-MD5" : base64md5,
-            "Content-Length" : contentLength
+            "Host": params.host,
+            "Proxy-Authorization": authHeader,
+            "Authorization": params.token,
+            "Date": dateHeader,
+            "Content-Type": params.contentType,
+            "Content-MD5": base64md5,
+            "Content-Length": contentLength
         }
     }
 
